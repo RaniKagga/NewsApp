@@ -13,7 +13,7 @@ class MockNewsAPIService: NewsAPIServiceProtocol {
     
     func fetchNewsArticles() async throws -> Result<[NewsArticle], NetworkError> {
         let urlString = baseURL.absoluteString + "apiKey"
-        guard let url = URL(string: urlString) else {
+        guard let _ = URL(string: urlString) else {
             return .failure(.invalidURL)
         }
         

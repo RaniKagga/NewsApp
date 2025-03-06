@@ -21,7 +21,7 @@ protocol NewsAPIServiceProtocol {
 
 class NewsAPIService: NewsAPIServiceProtocol {
 
-    private let apiKey = "API_KEY"
+    private let apiKey = "API_KEY" //Replace original api key here
     private let baseURL = URL(string: "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=")!
     
     func fetchNewsArticles() async throws -> Result<[NewsArticle], NetworkError> {
@@ -72,8 +72,7 @@ class NewsAPIService: NewsAPIServiceProtocol {
         
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            let count = String(data: data, encoding: .utf8)!
-            print("\(type) count - \(count)")
+           
             do {
                 if type == "likes" {
                     let resp = try JSONDecoder().decode(LikesResponse.self, from: data)

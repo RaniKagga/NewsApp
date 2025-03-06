@@ -90,6 +90,3 @@ struct ListView: View {
     }
 }
 
-#Preview {
-    NewsArticleListView()
-}

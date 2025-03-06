@@ -7,6 +7,7 @@
 
 import Foundation
 
+//To convert ISO date format to Month, date and year format
 func formatDate(_ isoDate: String) -> String {
     let formatter = ISO8601DateFormatter()
     formatter.timeZone = TimeZone(secondsFromGMT: 0)

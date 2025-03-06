@@ -42,7 +42,7 @@ class NewsViewModel: ObservableObject, @unchecked Sendable {
             }
         }
     }
-    
+
     func fetchLikes(_ url: String) {
         Task {
             do {

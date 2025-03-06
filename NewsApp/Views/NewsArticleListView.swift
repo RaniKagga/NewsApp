@@ -13,7 +13,7 @@ struct NewsArticleListView: View {
     @EnvironmentObject var newsViewModel: NewsViewModel
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             Group {
                 if newsViewModel.isLoading {
                     ProgressView("Loading news...")
@@ -33,13 +33,14 @@ struct NewsArticleListView: View {
                     List(newsViewModel.newsArticles) { article in
                         NavigationLink(destination: NewsArticleDetailView(article: article)) {
                             ListView(item: article)
+                                
                         }
                     }.refreshable {
                         newsViewModel.fetchNewsArticles()
                     }
                 }
             }.navigationBarTitle("News")
-            .onAppear {
+            .task {
                 newsViewModel.fetchNewsArticles()
             }
         }
@@ -48,6 +49,8 @@ struct NewsArticleListView: View {
 
 struct ListView: View {
     let item: NewsArticle
+    @EnvironmentObject var bookmarksVM: BookmarksViewModel
+    @State private var bookmarked: Bool = false
     
     var body: some View {
         HStack(spacing: 10) {
@@ -67,6 +70,22 @@ struct ListView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+            
+            Image(systemName: (bookmarked ? "bookmark.fill" : "bookmark"))
+        }.onAppear {
+            bookmarked = bookmarksVM.isBookmarked(item)
+        }.swipeActions {
+            Button {
+                if bookmarked {
+                    bookmarksVM.removeBookmark(item)
+                } else {
+                    bookmarksVM.addBookmark(item)
+                }
+                bookmarked.toggle()
+            } label: {
+                Image(systemName: (bookmarked ? "bookmark.fill" : "bookmark"))
+            }
+
         }
     }
 }

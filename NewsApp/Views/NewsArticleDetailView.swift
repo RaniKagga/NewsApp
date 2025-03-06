@@ -15,43 +15,29 @@ struct NewsArticleDetailView: View {
 
     var body: some View {
         ScrollView {
-            Group {
-                VStack(alignment: .center, spacing: 10) {
-                    Text(article.title)
-                        .font(.title)
-                        .fontWeight(.bold)
-                    Text(article.description ?? "No Description Available")
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
-                    Text("-")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.green)
-                    Text("By \(article.author ?? "Unknown Author")")
-                        .fontWeight(.semibold)
-                    Text("\(article.publishedAt)")
-                        .foregroundStyle(.gray)
-                    
-                    HStack(spacing: 20) {
-                        Spacer()
-                        HStack {
-                            VStack {
-                                Image(systemName: "hand.thumbsup.fill")
-                                Text("Likes")
-                            }
-                            Text("\(newsViewModel.likesCount)")
-                        }
-                        Spacer()
-                        HStack {
-                            VStack {
-                                Image(systemName: "ellipsis.message")
-                                Text("Comments")
-                            }
-                            Text("\(newsViewModel.commentsCount)")
-                        }
-                        Spacer()
-                    }
-                }
+            VStack(alignment: .center, spacing: 10) {
+                Text(article.title)
+                    .font(.title)
+                    .fontWeight(.bold)
+                Text(article.description ?? "No Description Available")
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.leading)
+                Text("-")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.green)
+                Text("By \(article.author ?? "Unknown Author")")
+                    .fontWeight(.semibold)
+                Text("\(formatDate(article.publishedAt))")
+                    .foregroundStyle(.gray)
+                
+                HStack(spacing: 20) {
+                    Spacer()
+                    Label("Likes: \(newsViewModel.likesCount)", systemImage: "hand.thumbsup.fill")
+                    Spacer()
+                    Label("Comments: \(newsViewModel.commentsCount)", systemImage: "ellipsis.message")
+                    Spacer()
+                }.padding()
                 
                 AsyncImage(url: URL(string: article.urlToImage ?? "")) { image in
                     image.resizable()
@@ -70,7 +56,6 @@ struct NewsArticleDetailView: View {
                     .lineLimit(nil)
                 
                 HStack {
-                    Spacer()
                     Button(action: {
                         if let url = URL(string: article.url) {
                             UIApplication.shared.open(url)
@@ -81,19 +66,25 @@ struct NewsArticleDetailView: View {
                             .cornerRadius(10)
                             .foregroundStyle(.white)
                             .background(.blue)
-                            
+                        
                     }
                     Spacer()
+                    Button {
+                        SpeechManager.shared.speak(article.description ?? article.content ?? article.title)
+                    } label: {
+                        Label("Read Content Loudly", systemImage: "speaker.wave.2.circle")
+                            .padding()
+                            .cornerRadius(10)
+                            .foregroundStyle(.white)
+                            .background(.blue)
+                    }
                 }
             }.padding()
-            .onAppear {
+            .task {
                 newsViewModel.fetchLikes(article.url)
                 newsViewModel.fetchComments(article.url)
             }
-        }.navigationTitle("News Article Detail")
+        }
     }
 }
 
-#Preview {
-    NewsArticleDetailView(article: NewsArticle(source: Source(id: "", name: "The Journal"), author: "", title: "Case Study", description: "This journal is about case study", url: "", urlToImage: nil, publishedAt: "", content: nil))
-}

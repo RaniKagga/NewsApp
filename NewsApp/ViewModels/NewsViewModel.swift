@@ -6,13 +6,19 @@
 //
 
 import Foundation
+import SwiftUI
 
-class NewsViewModel: ObservableObject {
+class NewsViewModel: ObservableObject, @unchecked Sendable {
     @Published var newsArticles: [NewsArticle] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     @Published var likesCount: Int = 0
     @Published var commentsCount: Int = 0
+    private var newsApiService: NewsAPIServiceProtocol
+    
+    init(apiService: NewsAPIServiceProtocol = NewsAPIService()) {
+        newsApiService = apiService
+    }
     
     func fetchNewsArticles() {
         isLoading = true
@@ -20,7 +26,7 @@ class NewsViewModel: ObservableObject {
         
         Task {
             do {
-                let newsArticles = try await NewAPIService.shared.fetchNewsArticles()
+                let newsArticles = try await newsApiService.fetchNewsArticles()
                 DispatchQueue.main.async {
                     self.isLoading = false
                     switch newsArticles {
@@ -40,17 +46,17 @@ class NewsViewModel: ObservableObject {
     func fetchLikes(_ url: String) {
         Task {
             do {
-                let likesCount = try await NewAPIService.shared.fetchLikesAndCommentsCount(articleId: url, type: "likes")
+                let likesCount = try await newsApiService.fetchLikesAndCommentsCount(articleId: url, type: "likes")
                 DispatchQueue.main.async {
                     switch likesCount {
                     case .success(let count):
                         self.likesCount = count
                     case .failure(let error):
-                        self.errorMessage = error.localizedDescription
+                        print("Error while fetching Likes: \(error.localizedDescription)")
                     }
                 }
             } catch {
-                print("\(error.localizedDescription)")
+                print("Error while fetching Likes: \(error.localizedDescription)")
             }
         }
     }
@@ -58,17 +64,17 @@ class NewsViewModel: ObservableObject {
     func fetchComments(_ url: String) {
         Task {
             do {
-                let commentsCount = try await NewAPIService.shared.fetchLikesAndCommentsCount(articleId: url, type: "comments")
+                let commentsCount = try await newsApiService.fetchLikesAndCommentsCount(articleId: url, type: "comments")
                 DispatchQueue.main.async {
                     switch commentsCount {
                     case .success(let count):
                         self.commentsCount = count
                     case .failure(let error):
-                        self.errorMessage = error.localizedDescription
+                        print("Error while fetching Comments: \(error.localizedDescription)")
                     }
                 }
             } catch {
-                print("\(error.localizedDescription)")
+                print("Error while fetching Comments: \(error.localizedDescription)")
             }
         }
     }

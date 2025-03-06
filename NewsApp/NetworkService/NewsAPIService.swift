@@ -1,5 +1,5 @@
 //
-//  NewAPIService.swift
+//  NewsAPIService.swift
 //  NewsApp
 //
 //  Created by K Nagarani on 05/03/25.
@@ -14,10 +14,14 @@ enum NetworkError: Error {
     case unKnown
 }
 
-class NewAPIService {
-//    private init () {}
-//    static let shared = NewAPIService()
-    private let apiKey = "3d85373dc0c84b7a8b687bcd6366d683"//"API_KEY"
+protocol NewsAPIServiceProtocol {
+    func fetchNewsArticles() async throws -> Result<[NewsArticle], NetworkError>
+    func fetchLikesAndCommentsCount(articleId: String, type: String) async throws -> Result<Int, NetworkError>
+}
+
+class NewsAPIService: NewsAPIServiceProtocol {
+
+    private let apiKey = "API_KEY"
     private let baseURL = URL(string: "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=")!
     
     func fetchNewsArticles() async throws -> Result<[NewsArticle], NetworkError> {
@@ -28,8 +32,6 @@ class NewAPIService {
        
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            let stringResp = String(data: data, encoding: .utf8)
-            print(stringResp)
             do {
                 let response = try JSONDecoder().decode(NewsArticleResponse.self, from: data)
                 return .success(response.articles)

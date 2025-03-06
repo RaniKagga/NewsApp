@@ -13,7 +13,11 @@ struct NewsArticleResponse: Codable {
     let articles: [NewsArticle]
 }
 
-struct NewsArticle: Codable, Identifiable {
+struct NewsArticle: Codable, Identifiable, Equatable {
+    static func == (lhs: NewsArticle, rhs: NewsArticle) -> Bool {
+        return true
+    }
+    
     let id = UUID()
     let source: Source
     let author: String?

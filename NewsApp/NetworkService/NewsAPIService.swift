@@ -15,9 +15,9 @@ enum NetworkError: Error {
 }
 
 class NewAPIService {
-    private init () {}
-    static let shared = NewAPIService()
-    private let apiKey = "API_KEY"
+//    private init () {}
+//    static let shared = NewAPIService()
+    private let apiKey = "3d85373dc0c84b7a8b687bcd6366d683"//"API_KEY"
     private let baseURL = URL(string: "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=")!
     
     func fetchNewsArticles() async throws -> Result<[NewsArticle], NetworkError> {
